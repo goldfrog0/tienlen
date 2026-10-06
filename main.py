@@ -11,17 +11,17 @@ def main():
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 
     gap = 10
-    center_point = screen.get_rect()
+    screen_rect = screen.get_rect()
 
-    test_card_right = Card(0,0,CARD_H,CARD_W,"3","Spades")
     temp0 = CardRenderer(CARD_W,CARD_H)
-    right_card_surface = temp0.render(test_card_right)
-    right_card_rect = right_card_surface.get_rect(midleft=(center_point.centerx + gap, center_point.centery))
     
-    test_card_left = Card(0,0,CARD_H,CARD_W,"King","Hearts")
-    temp1 = CardRenderer(CARD_W,CARD_H)
-    left_card_surface = temp1.render(test_card_left)
-    left_card_rect = left_card_surface.get_rect(midright=(center_point.centerx - gap, center_point.centery))
+    test_card_right = Card("Ace","Spades")
+    right_card_surface = temp0.render(test_card_right)
+    right_card_rect = right_card_surface.get_rect(midleft=(screen_rect.centerx + gap, screen_rect.centery))
+    
+    test_card_left = Card("Queen","Hearts")
+    left_card_surface = temp0.render(test_card_left)
+    left_card_rect = left_card_surface.get_rect(midright=(screen_rect.centerx - gap, screen_rect.centery))
     
     clock = pygame.time.Clock()
     dt = 0.0
@@ -31,7 +31,7 @@ def main():
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
-
+    
     # Game Loop
     while True:
         log_state() 

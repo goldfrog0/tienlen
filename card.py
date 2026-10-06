@@ -1,18 +1,11 @@
 #!/usr/bin/env python
-import pygame
-import rectangle as rect
 from constants import (SUITS, RANKS)
 
-class Card(rect.RectangleShape):
+class Card():
     def __init__(self,
-                 x: float,
-                 y: float,
-                 h: float,
-                 w: float,
                  rank: str,
                  suit: str
                  ) -> None:
-        super().__init__(x,y,h,w)
         self.rank = rank
         self.suit = suit
         self.rank_index = RANKS.index(rank)

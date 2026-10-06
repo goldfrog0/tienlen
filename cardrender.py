@@ -58,7 +58,7 @@ class CardRenderer():
         suit_rect = suit_surface.get_rect(midtop=rank_rect.midbottom)
         base.blit(rank_surface, rank_rect)
         base.blit(suit_surface, suit_rect)
-        return base
+        return base.convert_alpha()
 
     def _blank_card(self) -> pygame.Surface:
         surf = pygame.Surface((self.width,self.height), pygame.SRCALPHA)

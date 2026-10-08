@@ -4,6 +4,7 @@ from card import Card
 from cardrender import CardRenderer
 from deck import Deck
 from constants import (SCREEN_HEIGHT, SCREEN_WIDTH, CARD_W, CARD_H)
+from hand import (Hand)
 
 from logger import (log_state, log_event)
 
@@ -25,26 +26,29 @@ def main():
     print(len(faces), faces[originaldeck[0]].get_size())
     
     card_piles = originaldeck.deal(4)
-    player_hand = card_piles[0]
-
-    card_step = 70
-    fan_width = CARD_W + (len(player_hand) - 1)*card_step
-    leftmost_card_edge = (SCREEN_WIDTH - fan_width) // 2
-    card_bottoms = SCREEN_HEIGHT - 20
+    player_hand = Hand(card_piles[0][0:4])
 
     #drawing hands
-    player_hand_rects = []
-    for idx, card in enumerate(player_hand):
-        x = leftmost_card_edge + idx * card_step
-        rect = faces[card].get_rect(bottomleft=(x, card_bottoms))
-        player_hand_rects.append((card,rect))
-    
+    max_width = 990
+    max_step = 160
+    player_hand_rects = player_hand.layout((CARD_W,CARD_H),
+                                           max_width,
+                                           max_step,
+                                           screen_rect.centerx,
+                                           SCREEN_HEIGHT - 20)
+
     # game running basics
     clock = pygame.time.Clock()
     dt = 0.0
 
     updatable = pygame.sprite.Group()
     drawable = pygame.sprite.Group()
+
+    #tracks selected cards
+    selected_cards = set()
+
+    #card lift
+    selected_card_lift = 25
     
     # Game Loop
     while True:
@@ -53,13 +57,31 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                for card, area in reversed(player_hand_rects):
+                    if card in selected_cards:
+                        if area.move(0,-selected_card_lift).collidepoint(event.pos):
+                            selected_cards.remove(card)
+                            print(f"removed: {card}")
+                            break
+                    else:
+                       if area.collidepoint(event.pos):     
+                           selected_cards.add(card)
+                           print(f"selected: {card}")
+                           break
+                    for card in selected_cards:
+                        print(card)
+                    
         screen.fill((20, 80, 50))
         
         #screen.blit(left_card_surface, left_card_rect)
         #screen.blit(right_card_surface, right_card_rect)
 
         for card, rect in player_hand_rects:
-            screen.blit(faces[card], rect)
+            if card in selected_cards:
+                screen.blit(faces[card], rect.move(0, -selected_card_lift))
+            else:
+                screen.blit(faces[card], rect)
             
         
         pygame.display.flip()

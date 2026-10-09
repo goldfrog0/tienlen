@@ -1,6 +1,7 @@
 #!/usr/bin/env python
+from typing import Iterable
 import pytest
-from rules import Kind, classify
+from rules import Kind, beats, classify
 from card import Card
 
 @pytest.mark.parametrize("cards, expected", [
@@ -20,3 +21,12 @@ from card import Card
 ])
 def test_classify(cards, expected):
     assert classify(cards) == expected
+
+TEST_TRIPLE_4 = [Card("4", "Hearts"), Card("4", "Diamonds"), Card("4", "Spades")]
+TEST_TRIPLE_3 = [Card("3", "Hearts"), Card("3", "Diamonds"), Card("3", "Spades")]
+@pytest.mark.parametrize("card_state, expected",[
+    pytest.param((TEST_TRIPLE_4,TEST_TRIPLE_3), True, id="basic pair comp")
+])
+def test_beats(card_state, expected):
+    play, pile = card_state
+    assert beats(play, pile) == expected

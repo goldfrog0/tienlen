@@ -2,11 +2,12 @@
 
 from card import(Card)
 from collections.abc import Sequence
+from typing import (Iterable)
 import random
 import pygame
 
 class Hand(Sequence[Card]):
-    def __init__(self, cards: list[Card] ) -> None:
+    def __init__(self, cards: Iterable[Card] ) -> None:
         self._cards = sorted(cards)
 
     def __getitem__(self, key):

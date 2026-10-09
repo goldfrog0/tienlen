@@ -26,19 +26,31 @@ def main():
     print(len(faces), faces[originaldeck[0]].get_size())
     
     card_piles = originaldeck.deal(4)
-    player_hand = Hand(card_piles[0][0:4])
+    player_hand = Hand(card_piles[0][0:13])
 
     #drawing hands
     max_width = 990
     max_step = 160
+
+    # helper function for updating player_hand rects
     def layout_player():
         return player_hand.layout((CARD_W,CARD_H),
-                                           max_width,
-                                           max_step,
-                                           screen_rect.centerx,
-                                           SCREEN_HEIGHT - 20)
+                                  max_width,
+                                  max_step,
+                                  screen_rect.centerx,
+                                  SCREEN_HEIGHT - 20)
     player_hand_rects = layout_player()
 
+    # center pile setup
+    center_pile = Hand([])
+    def layout_center_pile():
+        return center_pile.layout((CARD_W, CARD_H),
+                                  500,
+                                  max_step,
+                                  screen_rect.centerx,
+                                  screen_rect.centery + (CARD_H // 2))
+
+    center_pile_rects = layout_center_pile()
     # game running basics
     clock = pygame.time.Clock()
     dt = 0.0
@@ -76,22 +88,27 @@ def main():
                             for card in selected_cards:
                                  print(card)
                 case pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN: 
-                        player_hand = player_hand.without(selected_cards)
-                        selected_cards = set()
-                        player_hand_rects = layout_player()
-                    
+                    if event.key == pygame.K_RETURN:
+                        if selected_cards:
+                            player_hand = player_hand.without(selected_cards)
+                            center_pile = Hand(list(selected_cards))
+                            selected_cards = set()
+                            player_hand_rects = layout_player()
+                            center_pile_rects = layout_center_pile()
+                            
+        #draw table color
         screen.fill((20, 80, 50))
-        
-        #screen.blit(left_card_surface, left_card_rect)
-        #screen.blit(right_card_surface, right_card_rect)
-
+    
+        #blit player hand
         for card, rect in player_hand_rects:
             if card in selected_cards:
                 screen.blit(faces[card], rect.move(0, -selected_card_lift))
             else:
                 screen.blit(faces[card], rect)
-            
+
+        #blit center pile
+        for card, rect in center_pile_rects:
+            screen.blit(faces[card], rect)
         
         pygame.display.flip()
 

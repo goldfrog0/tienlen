@@ -31,11 +31,13 @@ def main():
     #drawing hands
     max_width = 990
     max_step = 160
-    player_hand_rects = player_hand.layout((CARD_W,CARD_H),
+    def layout_player():
+        return player_hand.layout((CARD_W,CARD_H),
                                            max_width,
                                            max_step,
                                            screen_rect.centerx,
                                            SCREEN_HEIGHT - 20)
+    player_hand_rects = layout_player()
 
     # game running basics
     clock = pygame.time.Clock()
@@ -55,22 +57,29 @@ def main():
         log_state() 
         
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                return
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                for card, area in reversed(player_hand_rects):
-                    if card in selected_cards:
-                        if area.move(0,-selected_card_lift).collidepoint(event.pos):
-                            selected_cards.remove(card)
-                            print(f"removed: {card}")
-                            break
-                    else:
-                       if area.collidepoint(event.pos):     
-                           selected_cards.add(card)
-                           print(f"selected: {card}")
-                           break
-                    for card in selected_cards:
-                        print(card)
+            match event.type:
+                case pygame.QUIT:
+                    return
+                case pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:
+                        for card, area in reversed(player_hand_rects):
+                            if card in selected_cards:
+                                if area.move(0,-selected_card_lift).collidepoint(event.pos):
+                                    selected_cards.remove(card) 
+                                    print(f"removed: {card}")
+                                    break
+                            else:
+                                if area.collidepoint(event.pos):     
+                                    selected_cards.add(card)
+                                    print(f"selected: {card}")
+                                    break
+                            for card in selected_cards:
+                                 print(card)
+                case pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN: 
+                        player_hand = player_hand.without(selected_cards)
+                        selected_cards = set()
+                        player_hand_rects = layout_player()
                     
         screen.fill((20, 80, 50))
         

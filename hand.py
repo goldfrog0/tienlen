@@ -43,3 +43,12 @@ class Hand(Sequence[Card]):
             rect.bottomleft = (x, bottom)
             player_hand_rects.append((card, rect))
         return player_hand_rects
+
+    def without(self, removed_cards: set[Card]):
+        new_hand_list = []
+        for card in self:
+            if card not in removed_cards:
+                new_hand_list.append(card)
+            if card in removed_cards:
+                pass
+        return Hand(new_hand_list)

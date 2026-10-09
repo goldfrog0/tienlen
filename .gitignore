@@ -9,3 +9,5 @@ game_state.jsonl
 game_events.jsonl
 # Virtual environments
 .venv
+# test cache
+.pytest_cache/

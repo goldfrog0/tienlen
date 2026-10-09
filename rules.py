@@ -9,6 +9,7 @@ class Kind(Enum):
     DOUBLE = auto()
     TRIPLE = auto()
     QUAD = auto()
+    RUN = auto()
 
 KIND_BY_RANK_COUNT = {
     1: Kind.SINGLE,

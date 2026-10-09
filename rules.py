@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from card import Card
+from hand import Hand
 from typing import Iterable
 from enum import Enum, auto
 
@@ -23,10 +24,22 @@ def classify(cards: Iterable[Card]) -> Kind | None:
     cards = sorted(cards)
     indices = {card.rank_index for card in cards}
     if cards:
-        if len(indices) == 1:
-            return KIND_BY_RANK_COUNT[len(cards)]
-        else:
-            return None
+        match len(indices):
+            case 1: # single checker
+                return KIND_BY_RANK_COUNT[len(cards)]
+            case n if (n <= 13 and n > 2):
+                # run checker  
+                neighbors = zip(sorted(list(indices)), sorted(list(indices))[1:])
+                if "2" in [card.rank for card in cards]:
+                    return None
+                if len(indices) != len(cards):
+                    return None
+                neighbor_checks = []
+                for a, b in neighbors:
+                    neighbor_checks.append(b == a + 1) 
+                return Kind.RUN if all(neighbor_checks) else None 
+            case _:
+                return None
     else:
         return None
 

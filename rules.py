@@ -3,6 +3,7 @@
 from card import Card
 from typing import Iterable
 from enum import Enum, auto
+from collections.abc import Collection 
 
 class Kind(Enum):
     SINGLE = auto()
@@ -42,20 +43,14 @@ def classify(cards: Iterable[Card]) -> Kind | None:
     else:
         return None
 
-def beats(play: Iterable[Card], pile: Iterable[Card]) -> bool:
+def beats(play: Collection[Card], pile: Collection[Card]) -> bool:
     play_kind, pile_kind = classify(play), classify(pile)    
     if play_kind == pile_kind:
-        match play_kind:
-            case Kind.SINGLE:
-                if max(play) > max(pile):    # outrank
-                    return True
-                elif max(play).rank == max(pile).rank: # outsuit check
-                    return max(play) > max(pile)       # outsuit
-            case Kind.DOUBLE | Kind.TRIPLE | Kind.QUAD:
-                if max(play) > max(pile):    # outrank
-                    return True
-                elif max(play).suit == max(pile).suit: # outsuit check
-                    return max(play) > max(pile) 
+        match play_kind:  
+            case Kind.SINGLE | Kind.DOUBLE | Kind.TRIPLE | Kind.QUAD:
+                return max(play) > max(pile) 
+            case Kind.RUN:
+                return max(play) > max(pile) and len(play) == len(pile) 
             case _: return False
     else:
         #check for chops

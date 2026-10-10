@@ -53,9 +53,12 @@ def beats(play: Collection[Card], pile: Collection[Card]) -> bool:
                 return max(play) > max(pile) and len(play) == len(pile) 
             case _: return False
     else:
+        if pile:
+            return False
         #check for chops
         #check no chop
-        return False
+        else:
+            return True
 def main():
     test_card1 = Card("Ace", "Diamonds")
     test_card2 = Card("Ace", "Spades" )

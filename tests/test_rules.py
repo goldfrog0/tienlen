@@ -25,8 +25,12 @@ def test_classify(cards, expected):
 
 
 def make_run(high_card: int, length: int, suit: str) -> List[Card]:
+    start = high_card - length + 1
+    end = high_card + 1
+    if start < 0:
+        raise ValueError("cannot make a run with that end point, and length (negative starting index)")
     made_run = []
-    for i in range(high_card-length,high_card+1):
+    for i in range(start,end):
         made_run.append(Card(RANKS[i], suit))
     return made_run
 
@@ -38,6 +42,15 @@ TEST_RUN_3_9 = make_run(6, 3, "Diamonds")
 
 TEST_RUN_4_10 = make_run(7, 4, "Hearts")
 TEST_RUN_4_9 = make_run(6, 4, "Diamonds")
+
+TEST_RUN_3_A = make_run(11, 3, "Hearts")
+TEST_RUN_3_K = make_run(10, 3, "Diamonds")
+
+TEST_ILLEGAL_SHORT_RUN = [Card("3", "Hearts"), Card("4", "Diamonds")]
+TEST_EMPTY = []
+
+TEST_DOUBLE_2SH = [Card("2", "Spades"), Card("2", "Hearts")]
+TEST_SINGLE_4C = [Card("4", "Clubs")]
     
 @pytest.mark.parametrize("card_state, expected",[
     pytest.param((TEST_TRIPLE_4,TEST_TRIPLE_3), True, id="basic pair comp"),
@@ -47,6 +60,13 @@ TEST_RUN_4_9 = make_run(6, 4, "Diamonds")
     pytest.param((TEST_RUN_4_10, TEST_RUN_4_9), True, id="4 card run comparison, no face cards"),
     pytest.param((TEST_RUN_4_9, TEST_RUN_4_10), False, id="4 card run comparison, no face cards, reverse"),
     pytest.param((TEST_RUN_4_10, TEST_RUN_3_9), False, id="4 card run vs 3 card run"),
+    pytest.param((TEST_RUN_3_A, TEST_RUN_3_K), True, id="3 card run comparison, face cards"),
+    pytest.param((TEST_TRIPLE_3, TEST_RUN_3_K), False, id="3 card run comparison vs triple"),
+    pytest.param((TEST_TRIPLE_3, TEST_EMPTY), True, id="empty pile"),
+    pytest.param((TEST_ILLEGAL_SHORT_RUN, TEST_EMPTY), False, id="illegal play on empty pile"),
+    pytest.param(([Card("3", "Clubs")], [Card("3", "Diamonds")]), False, id="Single vs Single, suit decides"),
+    pytest.param(([Card("4", "Clubs")], [Card("3", "Diamonds")]), True, id="Single vs Single"),
+    pytest.param((TEST_DOUBLE_2SH, TEST_SINGLE_4C), False, id="Pair vs Single"),
 ])
 def test_beats(card_state, expected):
     play, pile = card_state

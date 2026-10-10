@@ -28,8 +28,9 @@ def classify(cards: Iterable[Card]) -> Kind | None:
             case 1: # single checker
                 return KIND_BY_RANK_COUNT[len(cards)]
             case n if (n <= 13 and n > 2):
-                # run checker  
-                neighbors = zip(sorted(list(indices)), sorted(list(indices))[1:])
+                # run checker
+                sorted_indices = sorted(list(indices))
+                neighbors = zip(sorted_indices, sorted_indices[1:])
                 if "2" in [card.rank for card in cards]:
                     return None
                 if len(indices) != len(cards):

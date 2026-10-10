@@ -1,18 +1,16 @@
 import pygame
 import sys
-from card import Card
 from cardrender import CardRenderer
 from deck import Deck
 from constants import (SCREEN_HEIGHT, SCREEN_WIDTH, CARD_W, CARD_H)
 from hand import (Hand)
+from rules import (beats)
 
 from logger import (log_state, log_event)
 
 def main():
     pygame.init()
     screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
-    gap = 10
     screen_rect = screen.get_rect()
 
     temp0 = CardRenderer(CARD_W,CARD_H)
@@ -26,7 +24,7 @@ def main():
     print(len(faces), faces[originaldeck[0]].get_size())
     
     card_piles = originaldeck.deal(4)
-    player_hand = Hand(card_piles[0][0:13])
+    player_hand = Hand(card_piles[0])
 
     #drawing hands
     max_width = 990
@@ -55,9 +53,6 @@ def main():
     clock = pygame.time.Clock()
     dt = 0.0
 
-    updatable = pygame.sprite.Group()
-    drawable = pygame.sprite.Group()
-
     #tracks selected cards
     selected_cards = set()
 
@@ -84,18 +79,18 @@ def main():
                                 if area.collidepoint(event.pos):     
                                     selected_cards.add(card)
                                     print(f"selected: {card}")
-                                    break
-                            for card in selected_cards:
-                                 print(card)
+                                    break 
                 case pygame.KEYDOWN:
                     if event.key == pygame.K_RETURN:
                         if selected_cards:
-                            player_hand = player_hand.without(selected_cards)
-                            center_pile = Hand(list(selected_cards))
-                            selected_cards = set()
-                            player_hand_rects = layout_player()
-                            center_pile_rects = layout_center_pile()
-                            
+                            if beats(selected_cards, center_pile):
+                                player_hand = player_hand.without(selected_cards)
+                                center_pile = Hand(selected_cards)
+                                selected_cards = set()
+                                player_hand_rects = layout_player()
+                                center_pile_rects = layout_center_pile()
+                            else:
+                                print("selection does not beat pile")
         #draw table color
         screen.fill((20, 80, 50))
     

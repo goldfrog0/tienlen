@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import random
-from sys import exception
 from typing import Iterator
 from card import (Card)
 from hand import (Hand)

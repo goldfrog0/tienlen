@@ -3,7 +3,7 @@
 import pygame
 from typing import NamedTuple
 from card import Card
-from constants import(BODY_COLOR, CARD_H, CARD_RED,CARD_BLACK, CARD_W, OUTLINE_COLOR, SUITS, RANKS)
+from constants import(BODY_COLOR, CARD_RED,CARD_BLACK, OUTLINE_COLOR, SUITS, RANKS)
 
 
 rank_map: dict[str, str] = {

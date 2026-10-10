@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
 from card import(Card)
-from collections.abc import Sequence
+from collections.abc import (Sequence)
 from typing import (Iterable)
-import random
 import pygame
 
 class Hand(Sequence[Card]):

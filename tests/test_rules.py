@@ -3,7 +3,8 @@ from typing import Iterable, List
 import pytest
 from rules import Kind, beats, classify
 from card import Card
-from constants import (SUITS, RANKS)
+from hand import Hand
+from constants import (RANKS)
 
 @pytest.mark.parametrize("cards, expected", [
     pytest.param([Card("2", "Spades")], Kind.SINGLE, id="Single"),
@@ -22,7 +23,6 @@ from constants import (SUITS, RANKS)
 ])
 def test_classify(cards, expected):
     assert classify(cards) == expected
-
 
 def make_run(high_card: int, length: int, suit: str) -> List[Card]:
     start = high_card - length + 1
@@ -71,3 +71,14 @@ TEST_SINGLE_4C = [Card("4", "Clubs")]
 def test_beats(card_state, expected):
     play, pile = card_state
     assert beats(play, pile) == expected
+
+TEST_HAND_1 = [Card("3", "Hearts"), Card("7", "Hearts"),Card("4", "Diamonds")]
+TEST_HAND_2 = [Card("3", "Hearts"), Card("4", "Diamonds"),Card("7", "Hearts")]
+
+@pytest.mark.parametrize("cards, expected", [
+    pytest.param(TEST_HAND_2, TEST_HAND_2, id="tests that Hand() builds correctly"),
+    pytest.param(TEST_HAND_1, TEST_HAND_2, id="tests that Hand() sorts correctly"),
+])
+
+def test_hand_initialization(cards, expected):
+    assert list(Hand(cards)) == expected

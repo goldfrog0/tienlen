@@ -10,8 +10,9 @@ class Game():
         for idx, hand in enumerate(self.hands):
             if hand[0] == Card("3", "Spades"):
                 self.current = idx
-            else:
-                raise ValueError("No 3 of Spades found in player's hands")
+                break
+        else:
+            raise ValueError("No 3 of Spades found in player's hands")
         self.pile = Hand([])
         self.pile_owner = None
         self.passed = []
@@ -23,7 +24,7 @@ class Game():
         if beats(cards, self.pile):
             self.pile = Hand(cards) 
             self.hands[self.current] = self.hands[self.current].without(cards)
-            self.pile_owner = None
+            self.pile_owner = self.current
             self._next_turn()
             return True
         return False
@@ -41,6 +42,7 @@ class Game():
         if next_player == self.pile_owner:
             self.pile = Hand([])
             self.passed = []
+            self.pile_owner = None
             self.current = next_player
         elif next_player in self.passed:
             self.current = next_player

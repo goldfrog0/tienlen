@@ -5,8 +5,10 @@ from deck import Deck
 from constants import (SCREEN_HEIGHT, SCREEN_WIDTH, CARD_W, CARD_H)
 from hand import (Hand)
 from rules import (beats)
+from bot import choose_play
 
 from logger import (log_state, log_event)
+from game import Game
 
 def main():
     pygame.init()
@@ -22,17 +24,34 @@ def main():
     faces = {card: temp0.render(card) for card in originaldeck}
     originaldeck.shuffle()
     print(len(faces), faces[originaldeck[0]].get_size())
-    
-    card_piles = originaldeck.deal(4)
-    player_hand = Hand(card_piles[0])
 
+    #init game
+    card_piles = originaldeck.deal(4)
+    game = Game(card_piles)
+
+    # bot runner
+    def run_bots():
+        while game.current != 0 and (not game.check_game_over()):
+            current_player = game.current
+            bot_play = choose_play(game.hands[current_player], game.pile)
+            if bot_play is None:
+                game.pass_turn()
+            else:
+                if not game.play(bot_play): 
+                    game.pass_turn() 
+                if game.check_game_over():
+                    break
+
+    def player_can_act() -> bool:
+        return game.current == 0 and (not game.check_game_over())
+    
     #drawing hands
     max_width = 990
     max_step = 160
 
     # helper function for updating player_hand rects
     def layout_player():
-        return player_hand.layout((CARD_W,CARD_H),
+        return game.hands[0].layout((CARD_W,CARD_H),
                                   max_width,
                                   max_step,
                                   screen_rect.centerx,
@@ -40,9 +59,8 @@ def main():
     player_hand_rects = layout_player()
 
     # center pile setup
-    center_pile = Hand([])
     def layout_center_pile():
-        return center_pile.layout((CARD_W, CARD_H),
+        return game.pile.layout((CARD_W, CARD_H),
                                   500,
                                   max_step,
                                   screen_rect.centerx,
@@ -58,7 +76,10 @@ def main():
 
     #card lift
     selected_card_lift = 25
-    
+
+    run_bots()
+    center_pile_rects = layout_center_pile()
+    player_hand_rects = layout_player()
     # Game Loop
     while True:
         log_state() 
@@ -80,17 +101,24 @@ def main():
                                     selected_cards.add(card)
                                     print(f"selected: {card}")
                                     break 
-                case pygame.KEYDOWN:
+                case pygame.KEYDOWN if player_can_act():
                     if event.key == pygame.K_RETURN:
                         if selected_cards:
-                            if beats(selected_cards, center_pile):
-                                player_hand = player_hand.without(selected_cards)
-                                center_pile = Hand(selected_cards)
+                            if game.play(selected_cards): 
+                                player_hand_rects = layout_player()
+                                center_pile_rects = layout_center_pile()
                                 selected_cards = set()
+                                run_bots()
                                 player_hand_rects = layout_player()
                                 center_pile_rects = layout_center_pile()
                             else:
                                 print("selection does not beat pile")
+                    elif event.key == pygame.K_p:
+                        game.pass_turn()
+                        run_bots()
+                        player_hand_rects = layout_player()
+                        center_pile_rects = layout_center_pile()
+                        selected_cards = set()
         #draw table color
         screen.fill((20, 80, 50))
     

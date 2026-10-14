@@ -49,3 +49,9 @@ class Game():
             self._next_turn() 
         else:
             self.current = next_player
+
+    def check_game_over(self) -> bool:
+        for hand in self.hands:
+            if not hand: 
+                return True
+        return False
